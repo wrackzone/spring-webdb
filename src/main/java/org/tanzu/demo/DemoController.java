@@ -1,18 +1,21 @@
 package org.tanzu.demo;
 
-import org.tanzu.demo.model.Sensor;
-import org.tanzu.demo.model.SensorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.tanzu.demo.config.WebProperties;
+import org.tanzu.demo.model.Sensor;
+import org.tanzu.demo.model.SensorData;
+import org.tanzu.demo.model.SensorRepository;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Random;
 
 @Controller
@@ -25,11 +28,11 @@ public class DemoController {
     SensorRepository _sensorRepository;
 
     @Autowired
-    ConfigurableEnvironment _configurableEnvironment;
+    WebProperties _webProperties;
 
     @RequestMapping("/")
-    public String home(Model model) throws Exception {
-        Connection connection = _jdbcTemplate.getDataSource().getConnection();
+    public String home(Model model) throws SQLException {
+        Connection connection = Objects.requireNonNull(_jdbcTemplate.getDataSource()).getConnection();
         model.addAttribute("sensorDB", "Sensor DB: " + connection.getMetaData().getURL());
         connection.close();
         return "index";
@@ -43,9 +46,10 @@ public class DemoController {
     }
 
     @RequestMapping("/refresh")
-    public @ResponseBody
-    Iterable<Sensor> refresh() {
-        return _sensorRepository.findAll();
+    public @ResponseBody SensorData refresh() {
+        SensorData result = new SensorData( _sensorRepository.findAll(), _webProperties.getTempHeader(),
+                _webProperties.getPressureHeader(), _webProperties.getBannerTextColor(), _webProperties.getBannerText());
+        return result;
     }
 }
 

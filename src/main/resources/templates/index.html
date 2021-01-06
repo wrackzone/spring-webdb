@@ -14,7 +14,7 @@
 <div class="container-fluid">
     <div class="row">
         <div class="jumbotron">
-            <h1>Sensor Database</h1>
+            <h1 id="headerTitle"></h1>
         </div>
     </div>
     <div class="row">
@@ -25,10 +25,6 @@
                         <button type="button" id="writeButton" class="btn btn-primary">Add Sensor&nbsp;&nbsp;<i
                                 class="fa fa-toggle-up"></i></button>
                     </div>
-<!--                    <div class="col-sm-offset-2 col-sm-4">-->
-<!--                        <button type="button" id="shutdownButton" class="btn btn-danger">Shutdown&nbsp;&nbsp;<i-->
-<!--                                class="fa fa-bomb"></i></button>-->
-<!--                    </div>-->
                 </div>
             </form>
         </div>
@@ -59,17 +55,18 @@
     }
 
     function displayData(data) {
-        var tableHtml = '<table class="table"><thead><tr><th>ID</th><th>Temperature</th><th>Pressure</th></tr></thead><tbody>';
-        for (var index in data) {
-            tableHtml += '<tr><td>' + data[index].id + '</td><td>' + data[index].temperature + '</td><td>' + data[index].pressure + '</td></tr>';
+
+        console.log( 'Data=' + data );
+        $('#headerTitle').text( data.bannerText );
+        $('#headerTitle').css( 'color', data.bannerColor );
+
+        var tableHtml = '<table class="table"><thead><tr><th>ID</th><th>' + data.tempHeader + '</th><th>' + data.pressureHeader + '</th></tr></thead><tbody>';
+        for (var index in data.sensors) {
+            tableHtml += '<tr><td>' + data.sensors[index].id + '</td><td>' + data.sensors[index].temperature + '</td><td>' + data.sensors[index].pressure + '</td></tr>';
         }
         tableHtml += '</tbody></table>';
         $('#mapValues').html(tableHtml);
     }
-
-    // $('#shutdownButton').click(function () {
-    //     $.post('/shutdown', {});
-    // });
 
     $(document).ready(refresh);
     /*]]>*/
